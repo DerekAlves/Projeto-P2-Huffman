@@ -7,10 +7,8 @@ typedef struct element_queue
 {
 	void *item;
 	int freq;
-	struct Element_queue *next;
 	struct Element_queue *down_left;
 	struct Element_queue *down_right;
-
 }Element_queue;
 
 typedef struct heap 
@@ -24,12 +22,23 @@ typedef struct arvore
 	Element_queue *raiz;
  }arvore;
 
+typedef struct nodes_index
+{
+	void *item;
+	int shift_bit;
+	int bits;
+}Node_index;
+
+typedef struct hash_table
+{
+	Node_index *table[256];
+}Hash_Table;
+
 Element_queue *new_element_queue(void *item, int freq, Element_queue *down_left, Element_queue *down_right)
 {
 	Element_queue *node_queue = (Element_queue*) malloc(sizeof(Element_queue));
 	node_queue->item = item;
 	node_queue->freq = freq;
-	node_queue->next = NULL;
 	node_queue->down_left = down_left;
 	node_queue->down_right = down_right;
 	return node_queue;
@@ -40,17 +49,36 @@ heap* create_heap()
 	int i;
 	heap *new_heap = (heap*) malloc(sizeof(heap));
 	new_heap->size = 0;
-	for(i = 1; i < 257; i++) new_heap -> data[i] = NULL;
+	for(i = 1; i < 257; i++) 
+		new_heap->data[i] = NULL;
 	return new_heap;
 }
 
 arvore *create_tree()
 {
-	
 	arvore *new_tree = (arvore*) malloc(sizeof(arvore));
-	new_tree -> raiz = new_element_queue(NULL, NULL, NULL, NULL);
-
+	new_tree->raiz = new_element_queue(NULL, NULL, NULL, NULL);
 	return new_tree;
+}
+
+Node_index *new_index()
+{
+	Node_index *node = (Node_index*) malloc(sizeof(Node_index));
+	node->item = NULL;
+	node->shift_bit = -1;
+	node -> bits = 0;
+	return node;
+}
+
+Hash_Table *create_hash_table()
+{
+	int i;
+	Hash_Table *new_ht = (Hash_Table*) malloc(sizeof(Hash_Table));
+	for(i = 0; i < 257; i++)
+	{
+		new_ht->table[i] = new_index();
+	}
+	return new_ht;
 }
 
 void swap(int *x, int *y){ 
@@ -173,28 +201,67 @@ void heapsort(heap *heap)
 		heap->size--;
 		max_heapify(heap, 1);
 	}
-	//heap -> size = 256//LOOP INFINITO
 }
 
 
-Element_queue* criar_arvore(heap *heap, arvore *tree)
+Element_queue *criar_arvore(heap *heap, arvore *tree)
 {
+	int size;
 	while(heap->size > 1)
 	{
 		Element_queue *esq = dequeue(heap);
-		//printf("6\n");
 		Element_queue *dir = dequeue(heap);
-		//printf("7\n");
 
 		enqueue(heap, 42, esq->freq + dir->freq, esq, dir);
-		int size = heap -> size;
-		//printf("8\n");
+		size = heap->size;
 		heapsort(heap);
-		heap -> size = size;
+		heap->size = size;
 	}
 	return tree->raiz = dequeue(heap);
 }
 
+Node_index *add_element(Node_index *local, void *item, int shift_bit, int level)
+{
+	local->item = item;
+	local->shift_bit = shift_bit;
+	local -> bits = level;
+	return local;
+}
+
+void put(Hash_Table *ht, void *item, int shift_bit, int level)
+{
+	int index;
+	int item_aux = item;
+	index = item_aux % num_prime;
+	ht->table[index] = add_element(ht->table[index], item, shift_bit, level);
+	//printf("%c, %d\n", item, shift_bit);
+}
+
+void dfs(Element_queue *raiz, Hash_Table *ht, int flag, int shift_bit, int level)
+{
+	//printf("%c, %d\n", raiz->item, shift_bit);
+	if(raiz->down_left == NULL && raiz->down_right == NULL)
+	{
+		void *item = raiz->item;
+		put(ht, item, shift_bit, level);
+		return;
+	}
+	else
+	{	
+		if(flag == 1)
+		{
+			dfs(raiz->down_left, ht, 0, shift_bit + 0, level + 1);
+			dfs(raiz->down_right, ht, 0, shift_bit + 1, level + 1);
+		}
+		else
+		{
+			dfs(raiz->down_left, ht, 0, (shift_bit<<1), level + 1);
+			dfs(raiz->down_right, ht, 0, (shift_bit<<1) + 1, level + 1);
+		}
+	}
+}
+
+/*
 void print_heap(heap *heap, int size)
 {
 	int i;
@@ -204,16 +271,60 @@ void print_heap(heap *heap, int size)
 	}
 	puts("");
 }
-
 void print_pre_order(Element_queue* raiz)///TESTES
 {
 	if(raiz != NULL)
 	{
-		if(raiz -> freq != 0)
+		if(raiz->freq != 0)
 		{
-			printf("%c", raiz -> item /*raiz -> freq*/);
-			print_pre_order(raiz -> down_left);
-			print_pre_order(raiz -> down_right);
+			printf("%c", raiz->item);
+			print_pre_order(raiz->down_left);
+			print_pre_order(raiz->down_right);
+		}
+	}
+}*/
+
+void print_hash(Hash_Table *ht)
+{
+	int i =0;
+	while(i < 257)
+	{
+		if(ht->table[i]->shift_bit != -1)
+		{
+			printf("%c -> %d\n", ht->table[i]->item, ht->table[i]->shift_bit);
+		}
+		i++;
+	}
+	printf("\n");
+}
+
+void binary(Hash_Table *ht)
+{
+	int j;
+	for(j = 0; j < 257; j++)
+	{
+		if(ht->table[j]->shift_bit != -1)
+		{
+			printf("%c -> ", ht->table[j]->item);
+			int num = ht->table[j]->shift_bit;
+			int bits = ht -> table[j] -> bits;
+			int i = bits - 1;
+			int bin[15] = {};
+			while(num/2 > 0)
+			{
+				bin[i] = num % 2;
+				num = num/2;
+				i--;
+			}
+			if(num/2 == 0)
+			{
+				bin[i] = num;
+			}
+			for(i = 0; i < bits; i++)
+			{
+				printf("%d", bin[i]);
+			}	
+			printf("\n");
 		}
 	}
 }
@@ -221,7 +332,7 @@ void print_pre_order(Element_queue* raiz)///TESTES
 int main ()
 {
 	int freq[256] = {};
-	int i;
+	int i, size, shift_bit = 0, flag = 1;
 	unsigned char s;
 	FILE *f = fopen("teste.txt", "r");
 	FILE *p = fopen ("out.txt", "a");
@@ -232,27 +343,29 @@ int main ()
 	}
 	for(i = 0; i < 256; i++) 
 	{
-		if(freq[i] != 0) enqueue(heap, i, freq[i], NULL, NULL);
+		if(freq[i] != 0)
+		{
+			enqueue(heap, i, freq[i], NULL, NULL);
+		}
 	}
-	printf("1\n");
 	i = 0;
-	while(heap->data[i] != NULL) 
-	{
-		heap->data[i]->next = heap->data[i+1];
-		i++;
-	}
-	printf("2\n");
-	int size =  heap -> size;
+	size = heap->size;
 	heapsort(heap);
-	printf("3\n");
 	heap->size = size;
-	print_heap(heap, size);
-	printf("4\n");
+	//print_heap(heap, size);
 	arvore *tree = create_tree();
-	//printf("####\n");
-	print_pre_order(criar_arvore(heap, tree));
+	Element_queue *raiz;
+	raiz = criar_arvore(heap, tree);
 
-	//print_heap(heap);
+	Hash_Table *ht = create_hash_table();
+	dfs(raiz, ht, flag, shift_bit, 0);
+
+	print_hash(ht);
+
+	binary(ht);
+
+	//print_pre_order(raiz);
+	printf("\n");
 	fclose(f);
 	return 0;	
 }
