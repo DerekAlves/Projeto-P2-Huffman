@@ -1,14 +1,3 @@
-#ifndef HUFFMANTREE_H_
-#define HUFFMANTREE_H_
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "HuffmanHash.h"
-#include "HuffmanHeap.h"
-#include "types.h"
-
-
 /*////////////INFO////////////////////////////
  *
  * # Projeto-P2-Huffman
@@ -28,6 +17,16 @@
 
 /////////////START OF H FILE///////////////////
 
+#ifndef HUFFMANTREE_H_
+#define HUFFMANTREE_H_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "HuffmanHash.h"
+#include "HuffmanHeap.h"
+#include "types.h"
+
 #define num_prime 257
 
 ////////////////////HEADER/////////////////////
@@ -42,7 +41,7 @@ Huff_node *create_tree();
  *
  */
 
-Huff_node *criar_arvore(struct heap *heap, Huff_node *tree);
+Huff_node *criar_arvore(struct heap *heap/*, Huff_node *tree*/);
 /*COMENTARIO AQUI
  *
  */
@@ -53,6 +52,11 @@ void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bi
  */
 
 void print_pre_order(Huff_node* raiz);
+/*COMENTARIO AQUI
+ *
+ */
+
+void print_pre_order_file(Huff_node* raiz, FILE* out);
 /*COMENTARIO AQUI
  *
  */

@@ -1,12 +1,3 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "HuffmanHash.h"
-#include "HuffmanHeap.h"
-#include "HuffmanTree.h"
-#include "types.h"
-
-
 /*////////////INFO////////////////////////////
  *
  * # Projeto-P2-Huffman
@@ -26,7 +17,16 @@
 
 /////////////START OF C FILE///////////////////
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "HuffmanHash.h"
+#include "HuffmanHeap.h"
+#include "HuffmanTree.h"
+#include "types.h"
+
 #define num_prime 257
+
 
 void swap(int *x, int *y)
 {
@@ -106,7 +106,7 @@ Huff_node *dequeue_heap(Huff_heap *heap)
 	if (heap == NULL || heap->size == 0)
 	{
 		printf("Heap underflow");
-		return -1;
+		return NULL;
 	}
 	else
 	{
@@ -120,13 +120,15 @@ Huff_node *dequeue_heap(Huff_heap *heap)
 
 void heapsort(Huff_heap *heap)
 {
-	int i;
+	int i, size;
+	size = heap -> size;
 	for (i = heap->size; i >= 2; i--)
 	{
 		swap(&heap->data[1], &heap->data[i]);
 		heap->size--;
 		max_heapify(heap, 1);
 	}
+	heap -> size = size;
 }
 
 void print_heap(Huff_heap *heap, int size)

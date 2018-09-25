@@ -1,15 +1,3 @@
-
-
-#ifndef HUFFMANHEAP_H_
-#define HUFFMANHEAP_H_
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "HuffmanHash.h"
-#include "HuffmanTree.h"
-#include "types.h"
-
 /*////////////INFO////////////////////////////
  *
  * # Projeto-P2-Huffman
@@ -28,6 +16,17 @@
 */
 
 /////////////START OF H FILE///////////////////
+
+#ifndef HUFFMANHEAP_H_
+#define HUFFMANHEAP_H_
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "HuffmanHash.h"
+#include "HuffmanTree.h"
+#include "types.h"
+
 
 #define num_prime 257
 

@@ -1,13 +1,3 @@
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "HuffmanHash.h"
-#include "HuffmanHeap.h"
-#include "HuffmanTree.h"
-#include "types.h"
-
-
 /*////////////INFO////////////////////////////
  *
  * # Projeto-P2-Huffman
@@ -26,6 +16,15 @@
 */
 
 /////////////START OF C FILE///////////////////
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "HuffmanHash.h"
+#include "HuffmanHeap.h"
+#include "HuffmanTree.h"
+#include "types.h"
+
 
 #define num_prime 257
 
@@ -46,7 +45,7 @@ Huff_node *create_tree()
 	return new_tree;
 }
 
-Huff_node *criar_arvore(struct heap *heap, Huff_node *tree)
+Huff_node *criar_arvore(struct heap *heap/*, Huff_node *tree*/)
 {
 	int size;
 	while(heap->size > 1)
@@ -59,7 +58,7 @@ Huff_node *criar_arvore(struct heap *heap, Huff_node *tree)
 		heapsort(heap);
 		heap->size = size;
 	}
-	return tree = dequeue_heap(heap);
+	return dequeue_heap(heap);
 }
 
 void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bit, int level)
@@ -95,6 +94,19 @@ void print_pre_order(Huff_node* raiz)///TESTES
 			printf("%c", raiz->item);
 			print_pre_order(raiz->down_left);
 			print_pre_order(raiz->down_right);
+		}
+	}
+}
+
+void print_pre_order_file(Huff_node* raiz, FILE* out)
+{
+	if(raiz != NULL)
+	{
+		if(raiz->freq != 0)
+		{
+			fprintf(out, "%c", raiz->item);
+			print_pre_order_file(raiz->down_left, out);
+			print_pre_order_file(raiz->down_right, out);
 		}
 	}
 }
