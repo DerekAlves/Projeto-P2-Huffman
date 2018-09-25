@@ -24,6 +24,7 @@
 #include "HuffmanHeap.h"
 #include "HuffmanTree.h"
 #include "types.h"
+#include <math.h>
 
 
 void binary(Huff_hash *ht, int index, int bin[])
@@ -58,6 +59,7 @@ void comprimir(Huff_hash *ht)
 {
     int i, j = 0, limitante, bin[15] = {};
     unsigned char byte;
+
     for(i = 0; i < 256; i++)
     {
         if(ht->table[i]->freq != 0)
@@ -81,9 +83,27 @@ void comprimir(Huff_hash *ht)
                 }
             }
             j = 0;
-            printf("%d\n", byte);
+
         }
     }
+
+}
+
+int number_of_bytes (Huff_hash *ht)
+{
+		float bits = 0;
+	    int bytes,i;
+	    for(i = 0; i < 256; i++)
+	        {
+	            if(ht->table[i]->freq != 0)
+	            {
+	            	  bits += (ht->table[i]->bits * ht->table[i]->freq);
+	            }
+	        }
+
+	    bytes = ceil(bits/8);
+	    printf ("Bytes: %d\n",bytes);
+	    return bytes;
 }
 
 
@@ -134,6 +154,8 @@ void compress(/*Huff_node *tree*/)
 	dfs(raiz, ht, flag, shift_bit, 0);
 	print_pre_order(raiz);
 	printf("\n");
+	//comprimir(ht);
+	number_of_bytes(ht);
 	print_hash(ht);
 
 
