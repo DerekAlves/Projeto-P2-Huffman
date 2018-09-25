@@ -89,10 +89,10 @@ void comprimir(Huff_hash *ht)
 
 }
 
-int number_of_bytes (Huff_hash *ht)
+int number_of_bits (Huff_hash *ht)
 {
-		float bits = 0;
-	    int bytes,i;
+		int bits = 0;
+	    int i;
 	    for(i = 0; i < 256; i++)
 	        {
 	            if(ht->table[i]->freq != 0)
@@ -101,9 +101,13 @@ int number_of_bytes (Huff_hash *ht)
 	            }
 	        }
 
-	    bytes = ceil(bits/8);
-	    printf ("Bytes: %d\n",bytes);
-	    return bytes;
+	    //printf ("Bits: %d\n", bits);
+	    return bits;
+}
+
+int number_of_bytes(double bits)
+{
+	return ceil(bits/8);
 }
 
 
@@ -113,6 +117,7 @@ int number_of_bytes (Huff_hash *ht)
 
 void create_header(int trash_size, int tree_size, Huff_node *tree, FILE* out)
 {
+	printf("%d %d\n", trash_size, tree_size);
 	unsigned char a, b; a = b = 0;
 	a |= trash_size << 5; a |= tree_size >> 8;
 	b |= tree_size;
@@ -125,6 +130,17 @@ void create_header(int trash_size, int tree_size, Huff_node *tree, FILE* out)
 {
 
 }*/
+
+int tree_size(Huff_node* raiz)
+{
+	if(raiz == NULL) 
+		return 0;
+	else
+	{
+		return  1 + tree_size(raiz -> down_left) + tree_size(raiz -> down_right);
+	}
+
+}
 
 void compress(/*Huff_node *tree*/)
 {
@@ -155,11 +171,18 @@ void compress(/*Huff_node *tree*/)
 	print_pre_order(raiz);
 	printf("\n");
 	//comprimir(ht);
-	number_of_bytes(ht);
+	
+	int bits = number_of_bits(ht);
+	int bytes = number_of_bytes(bits);
+	int trash = (bytes*8) - bits;
+	printf("bits %d bytes %d trash %d\n", bits, bytes, trash);
+	int size_of_tree = tree_size(raiz);
+	printf("TS %d\n", size_of_tree);
+
 	print_hash(ht);
 
 
-	create_header(3, 49, raiz, out);//CALCULAR LIXO//E TAMANHO DA ARVORE
+	create_header(trash, size_of_tree, raiz, out);//CALCULAR LIXO//E TAMANHO DA ARVORE
 
 	in = fopen("teste.txt", "r");
 
