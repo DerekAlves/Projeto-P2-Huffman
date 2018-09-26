@@ -85,7 +85,7 @@ void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bi
 	}
 }
 
-void print_pre_order(Huff_node* raiz)///TESTES
+void print_pre_order(Huff_node* raiz)///IF PARA IMPRIMIR \ CASO NO SEJA FOLHA E O CARACTER SEJA * ou \  ////
 {
 	if(raiz != NULL)
 	{
@@ -98,7 +98,7 @@ void print_pre_order(Huff_node* raiz)///TESTES
 	}
 }
 
-void print_pre_order_file(Huff_node* raiz, FILE* out)
+void print_pre_order_file(Huff_node* raiz, FILE* out)///IF PARA IMPRIMIR \ CASO NO SEJA FOLHA E O CARACTER SEJA * ou \  ////
 {
 	if(raiz != NULL)
 	{

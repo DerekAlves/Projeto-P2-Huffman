@@ -55,7 +55,7 @@ void binary(Huff_hash *ht, int index, int bin[])
 	}
 }
 
-void comprimir(Huff_hash *ht)
+/*void comprimir(Huff_hash *ht)
 {
     int i, j = 0, limitante, bin[15] = {};
     unsigned char byte;
@@ -87,7 +87,7 @@ void comprimir(Huff_hash *ht)
         }
     }
 
-}
+}*/
 
 int number_of_bits (Huff_hash *ht)
 {
@@ -186,17 +186,30 @@ void compress(/*Huff_node *tree*/)
 
 	in = fopen("teste.txt", "r");
 
-	int bit_control = 0;
+	int control = 0;
+	int empty_bits = 8;
 
-	unsigned char x, y; x = y = 0;
-	/*while (fscanf(in, "%c", &s) != EOF)///PENSAR NA COMPRESSÃO!!!!
+	unsigned char aux = 0, c;
+
+	//COMPRESS
+	while (fscanf(in, "%c", &s) != EOF)
 	{
-		bit_control += ht ->table[s] -> bits;
-
-
-	}*/
-
-
+		control = ht -> table[s] -> bits;
+		empty_bits = empty_bits - control;
+		c = ht -> table[s] -> shift_bit;
+		if(empty_bits <= 0)
+		{
+			aux |= c >> abs(empty_bits);
+			fprintf(out, "%c", aux);
+			empty_bits =  8 + empty_bits;
+			aux = 0;
+			aux |= c << empty_bits;
+		}
+		else aux |= c << empty_bits;
+	}
+	fprintf(out, "%c", aux);
+	fclose(in);
+	fclose(out);
 
 	return;
 }
