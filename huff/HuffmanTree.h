@@ -46,6 +46,11 @@ Huff_node *criar_arvore(struct heap *heap/*, Huff_node *tree*/);
  *
  */
 
+Huff_node *create_tree_from_preorder(FILE* in);
+/*COMENTARIO AQUI
+ *
+ */
+
 void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bit, int level);
 /*COMENTARIO AQUI
  *

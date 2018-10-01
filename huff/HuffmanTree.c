@@ -61,6 +61,28 @@ Huff_node *criar_arvore(struct heap *heap/*, Huff_node *tree*/)
 	return dequeue_heap(heap);
 }
 
+Huff_node* create_tree_from_preorder(FILE* in)
+{
+	char c;
+	short int flag = 1;
+	fscanf(in, "%c", &c);
+	printf("CHAR %c\n", c);
+	if(c == 92)
+	{
+		fscanf(in, "%c", &c);
+		flag = 0;
+	}
+	Huff_node *tree_node;
+	tree_node = new_huff_node(c, 1, NULL, NULL);
+	if (c == '*' && flag)
+	{
+		//tree_node = new_huff_node(c, 1, create_tree_from_preorder(in), create_tree_from_preorder(in));
+		tree_node -> down_left = create_tree_from_preorder(in);
+		tree_node -> down_right = create_tree_from_preorder(in);
+	}
+	return tree_node;
+}
+
 void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bit, int level)
 {
 	//printf("%c, %d\n", raiz->item, shift_bit);

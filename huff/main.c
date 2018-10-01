@@ -26,89 +26,18 @@
 #include "types.h"
 #include <math.h>
 
-
-void binary(Huff_hash *ht, int index, int bin[])
-{
-	if(ht->table[index]->freq != 0)
-	{
-		//printf("%c -> ", ht->table[j]->item);
-		int num = ht->table[index]->shift_bit;
-		int bits = 8;
-		int i = bits - 1;
-		while(num/2 > 0)
-		{
-			bin[i] = num % 2;
-			num = num/2;
-			i--;
-		}
-		if(num/2 == 0)
-		{
-			bin[i] = num;
-		}
-		//return bin;
-		/*
-		for(i = 0; i < bits; i++)
-		{
-			printf("%d", bin[i]);
-		}
-		printf("\n");*/
-	}
-}
-
-/*void comprimir(Huff_hash *ht)
-{
-    int i, j = 0, limitante, bin[15] = {};
-    unsigned char byte;
-
-    for(i = 0; i < 256; i++)
-    {
-        if(ht->table[i]->freq != 0)
-        {
-            limitante = ht->table[i]->bits;
-            byte = ht->table[i]->shift_bit;
-            binary(ht, i, bin);
-            while(j < (8 -  ht->table[i]->bits))
-            {
-                byte = byte<<1;
-                int check = 8 - limitante;
-                if(bin[check] == 1)
-                {
-                    byte = byte + 1;
-                }
-                j++;
-                limitante--;
-                if(limitante == 0)
-                {
-                    limitante = ht->table[i]->bits;
-                }
-            }
-            j = 0;
-
-        }
-    }
-
-}*/
-
 int number_of_bits (Huff_hash *ht)
 {
 		int bits = 0;
 	    int i;
 	    for(i = 0; i < 256; i++)
-	        {
-	            if(ht->table[i]->freq != 0)
-	            {
-	            	  bits += (ht->table[i]->bits * ht->table[i]->freq);
-	            }
-	        }
+	    	if(ht->table[i]->freq != 0) bits += (ht->table[i]->bits * ht->table[i]->freq);
 
 	    //printf ("Bits: %d\n", bits);
 	    return bits;
 }
 
-int number_of_bytes(double bits)
-{
-	return ceil(bits/8);
-}
+int number_of_bytes(double bits){ return ceil(bits/8); }
 
 
 #define num_prime 257
@@ -126,20 +55,10 @@ void create_header(int trash_size, int tree_size, Huff_node *tree, FILE* out)
 	print_pre_order_file(tree, out);
 }
 
-/*void read_header()
-{
-
-}*/
-
 int tree_size(Huff_node* raiz)
 {
-	if(raiz == NULL) 
-		return 0;
-	else
-	{
-		return  1 + tree_size(raiz -> down_left) + tree_size(raiz -> down_right);
-	}
-
+	if(raiz == NULL) return 0;
+	else return  1 + tree_size(raiz -> down_left) + tree_size(raiz -> down_right);
 }
 
 void compress(/*Huff_node *tree*/)
@@ -214,6 +133,64 @@ void compress(/*Huff_node *tree*/)
 	return;
 }
 
+int is_bit_i_set(unsigned char byte, int i){ return (byte & (1 << i)); }
+
+void decompress()
+{
+	FILE* in = fopen("out.txt", "r");
+	FILE* out = fopen("saida.txt", "w");
+
+	char s;
+	int bytes = 0;
+	while(fscanf(in, "%c", &s) != EOF) bytes++;
+	printf("BYTES %d\n", bytes);
+	fclose(in);
+	in = fopen("out.txt", "r");
+
+	unsigned char a, b, trash;
+    //FILE *in = fopen("out.txt", "r");
+    fscanf(in, "%c%c", &a, &b);
+    trash = a>>5;
+    printf("lixo -> %d\n", trash);
+    a = a<<3;
+    a = a>>3;
+    short int tam_arv = a;
+    tam_arv = tam_arv<<8;
+    tam_arv |= b;
+    printf("tamanho da arvore -> %d\n", tam_arv);
+
+    bytes = bytes-(tam_arv + 2);
+    printf("BYTES %d\n", bytes);
+
+
+	Huff_node* raiz;
+	raiz = create_tree_from_preorder(in);
+	print_pre_order(raiz);
+	printf("\n");
+	///////////////
+
+	int i, j;
+
+	Huff_node* aux =  raiz;
+
+	for (i = 1; i <= bytes; i++)
+	{
+		fscanf(in, "%c", &s);
+		for(j = 7; j >= 0; j--)
+		{
+			if(j == (trash-1) && i == bytes) break;
+			if(is_bit_i_set(s, j)) raiz = raiz -> down_right;
+			else raiz = raiz -> down_left;
+
+			if(raiz -> down_right == NULL && raiz -> down_left == NULL)
+			{
+				fprintf(out, "%c", raiz -> item);
+				raiz = aux;
+			}
+		}
+	}
+}
+
 int main ()
 {
 
@@ -222,7 +199,7 @@ int main ()
 	scanf("%d", &menu);
 
 	if(menu == 1) compress();
-	//else if(menu == 2) return 0;// decompress();
+	else if(menu == 2) decompress();
 	else printf("Opção Inválida! Execute novamente o programa.\n");
 
 	return 0;
