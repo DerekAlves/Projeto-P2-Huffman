@@ -161,6 +161,72 @@ void remove_elemento (LinkedList *list, int value)
 	}
 }
 
+
+/////////////////---------ARVORE--------////////////////
+
+typedef struct binary_tree 
+{
+	int item;
+	struct binary_tree *left;
+	struct binary_tree *right;
+}Binary_tree;
+
+Binary_tree *create_binary(int item, Binary_tree *left, Binary_tree *right)
+{
+	Binary_tree *bt = (Binary_tree*) malloc(sizeof(Binary_tree));
+	bt->item = item;
+	bt->left = left;
+	bt->right = right;
+	return bt;
+}
+
+Binary_tree *add(Binary_tree *bt, int item)
+{
+	if (bt == NULL) 
+	{
+		bt = create_binary(item, NULL, NULL);
+	} 
+	else if (bt->item > item) 
+	{
+		bt->left = add(bt->left, item);
+	} 
+	else 
+	{
+		bt->right = add(bt->right, item);
+	}
+	return bt;
+}
+
+void search_tree(Binary_tree *bt, int item, int comparacoes[])
+{
+	if ((bt == NULL) || (bt->item == item)) 
+	{
+		comparacoes[0]++;
+	} 
+	else if (bt->item > item) 
+	{
+		comparacoes[0]++;
+		return search_tree(bt->left, item, comparacoes);
+	} 
+	else 
+	{
+		comparacoes[0]++;
+		return search_tree(bt->right, item, comparacoes);
+	}
+}
+
+void print_pre_order(Binary_tree *bt)
+{
+	printf(" (");
+	if (!(bt == NULL)) 
+	{
+		printf(" %d ", bt->item);
+		print_pre_order(bt->left);
+		print_pre_order(bt->right);
+	}
+	printf(") ");
+}
+
 int main()
 {
 	int elements[1000000];
