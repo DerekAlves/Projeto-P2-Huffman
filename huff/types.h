@@ -47,7 +47,7 @@ typedef struct heap Huff_heap;
 struct hash_data_set
 {
 	void *item;
-	unsigned char shift_bit;
+	unsigned int shift_bit;
 	int bits;
 	int freq;
 };

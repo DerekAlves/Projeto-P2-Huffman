@@ -1,4 +1,4 @@
-/*////////////INFO////////////////////////////
+	/*////////////INFO////////////////////////////
  *
  * # Projeto-P2-Huffman
 	Projeto para Estrutura de Dados (Huffman);
@@ -32,41 +32,39 @@
 ////////////////////HEADER/////////////////////
 
 Huff_node *new_huff_node(void *item, int freq, Huff_node *down_left, Huff_node *down_right);
-/*COMENTARIO AQUI
- *
+/* CRIA UM NO DE HUFFMAN, ADICIONA A ELE A FREQUENCIA, O ITEM E
+ * DA ENDEREÇO AOS SEUS DOIS PONTEIROS, LEFT E RIGHT.
  */
 
-Huff_node *create_tree();
-/*COMENTARIO AQUI
- *
+int tree_size(Huff_node* raiz);
+/* CALCULA O TAMANHO DA ARVORE */
+
+Huff_node *create_tree(Huff_heap *heap);
+/* CRIA A ARVORE DANDO DEQUEUE E ENQUEUE NA HEAP,
+ * RETORNANDO O NO RAIZ.
  */
 
-Huff_node *criar_arvore(struct heap *heap/*, Huff_node *tree*/);
-/*COMENTARIO AQUI
- *
- */
+Huff_node* create_tree_from_preorder(FILE* in, int a[]);
+/* CRIA A ARVORE A PARTIR DE SEU FORMATO EM PRE ORDEM,
+ * OBEDECENDO O CONTRATO DO CARACTER DE ESCAPE.
+*/
 
-Huff_node *create_tree_from_preorder(FILE* in);
-/*COMENTARIO AQUI
- *
- */
-
-void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bit, int level);
-/*COMENTARIO AQUI
- *
- */
+void create_encoding(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned int shift_bit, int level);
+/*ADICIONA NA HASH, OS VALORES QUE REPRESENTAM A NOVA CODIFICACAO
+ * PARA ISSO NAVEGA-SE NA ARVORE ATE ENCONTRAR UMA FOLHA, DANDO SHIFT-BIT E,
+ * SOMANDO UMA CASO NAVEGUEMOS PARA A DIREITA
+ * */
 
 void print_pre_order(Huff_node* raiz);
-/*COMENTARIO AQUI
- *
+/* PRINTA A ARVORE EM PRE ORDEM OBEDECENDO O
+ * ESTABELECIDO SOBRE O CARACTER DE ESCAPE
  */
 
 void print_pre_order_file(Huff_node* raiz, FILE* out);
-/*COMENTARIO AQUI
- *
+/* PRINTA A ARVORE EM PRE ORDEM EM UM ARQUIVO OBEDECENDO O
+ * ESTABELECIDO SOBRE O CARACTER DE ESCAPE
  */
 
 ////////////////////END OF H FILE/////////////////
-
 
 #endif /* HUFFMANTREE_H_ */

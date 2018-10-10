@@ -27,71 +27,40 @@
 #include "HuffmanTree.h"
 #include "types.h"
 
-
 #define num_prime 257
 
 ////////////////////HEADER/////////////////////
 
-void swap(int *x, int *y);
-/*COMENTARIO AQUI
- *
- */
+void swap(Huff_node **x, Huff_node **y);
+/* TROCA DOIS NOS DE HUFFMAN */
 
 Huff_heap* create_heap();
-/*COMENTARIO AQUI
- *
- */
+/*CRIA A HEAP E RETORNA O PONTEIRO */
 
 int get_parent_index(Huff_heap *heap, int i);
-/*COMENTARIO AQUI
- *
- */
+/*PEGA O INDICE DO PARENTE NA HEAP */
 
 int get_left_index(Huff_heap *heap, int i);
-/*COMENTARIO AQUI
- *
- */
+/*PEGA O INDICE DA ESQUERDA NA HEAP */
 
 int get_right_index(Huff_heap *heap, int i);
-/*COMENTARIO AQUI
- *
- */
+/*PEGA O INDICE DA DIREITA NA HEAP */
 
-int item_of(Huff_heap *heap, int i);
-/*COMENTARIO AQUI
- *
- */
+Huff_node *item_of(Huff_heap *heap, int i);
+/*RETORNA O ITEM DA HEAP, NA POSICAO I */
 
 void min_heapify(Huff_heap *heap, int i);
-/*COMENTARIO AQUI
- *
- */
+/* RESTAURA AS PROPRIEDADES DA MIN-HEAP */
 
-void max_heapify(Huff_heap *heap, int i);
-/*COMENTARIO AQUI
- *
- */
-void enqueue_heap(Huff_heap *heap, void *item, void *freq, Huff_node *down_left, Huff_node *down_right);
-/*COMENTARIO AQUI
- *
- */
+void enqueue_heap(Huff_heap *heap, void *item, int freq, Huff_node *down_left, Huff_node *down_right);
+/* ADICIONA UM NO DE HUFFMAN A HEAP */
 
 Huff_node *dequeue_heap(Huff_heap *heap);
-/*COMENTARIO AQUI
- *
- */
-
-void heapsort(Huff_heap *heap);
-/*COMENTARIO AQUI
- *
- */
+/* REMOVE UM NO DE HUFFMAN DA HEAP */
 
 void print_heap(Huff_heap *heap, int size);
-/*COMENTARIO AQUI
- *
- */
+/* PRINTA A HEAP ATE O SEU TAMANHO */
 
 ////////////////////END OF H FILE/////////////////
-
 
 #endif /* HUFFMANHEAP_H_ */

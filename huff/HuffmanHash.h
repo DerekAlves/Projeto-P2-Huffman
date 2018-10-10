@@ -32,32 +32,20 @@
 ////////////////////HEADER/////////////////////
 
 Hash_data *new_index();
-/*COMENTARIO AQUI
- *
- */
+/* ALOCA ESPACO PARA UM NOVO INDICE DA HASH*/
 
 Huff_hash *create_hash_table();
-/*COMENTARIO AQUI
- *
- */
+/* CRIA UMA NOVA HASH-TABLE*/
 
-Hash_data *add_element(Hash_data *local, void *item, unsigned char shift_bit, int level);
-/*COMETARIO AQUI
- *
- */
+Hash_data *create_data(Hash_data *local, void *item, unsigned int shift_bit, int level);
+/* CRIA O CONJUNTO DE DADOS DA HASH*/
 
-void put_hash(Huff_hash *ht, void *item, unsigned char shift_bit, int level);
-/*COMENTARIO AQUI
- *
- */
+void put_hash(Huff_hash *ht, void *item, unsigned int shift_bit, int level);
+/* USA A CREATE_DATA PARA CRIAR O CONJUNTO DE DADOS, E OS INSERE NA HASH*/
 
 void print_hash(Huff_hash *ht);
-/*COMENTARIO AQUI
- *
- */
-
+/* PRINTA A HASH */
 
 ////////////////////END OF H FILE/////////////////
-
 
 #endif /* HUFFMANHASH_H_ */

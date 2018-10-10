@@ -31,7 +31,7 @@ Hash_data *new_index()
 {
 	Hash_data *node = (Hash_data*) malloc(sizeof(Hash_data));
 	node->item = NULL;
-	node->shift_bit = NULL;
+	node->shift_bit = 0;
 	node -> bits = 0;
 	return node;
 }
@@ -41,39 +41,33 @@ Huff_hash *create_hash_table()
 	int i;
 	Huff_hash *new_ht = (Huff_hash*) malloc(sizeof(Huff_hash));
 	for(i = 0; i < 257; i++)
-	{
 		new_ht->table[i] = new_index();
-	}
 	return new_ht;
 }
 
-Hash_data *add_element(Hash_data *local, void *item, unsigned char shift_bit, int level)
+Hash_data *create_data(Hash_data *local, void *item, unsigned int shift_bit, int level)
 {
-	local->item = item;
-	local->shift_bit = shift_bit;
+	local -> item = item;
+	local -> shift_bit = shift_bit;
 	local -> bits = level;
 	return local;
 }
 
-void put_hash(Huff_hash *ht, void *item, unsigned char shift_bit, int level)
+void put_hash(Huff_hash *ht, void *item, unsigned int shift_bit, int level)
 {
 	int index;
-	int item_aux = item;
+	int item_aux = *(int*)item;
 	index = item_aux % num_prime;
-	ht->table[index] = add_element(ht->table[index], item, shift_bit, level);
-	//printf("%c, %d\n", item, shift_bit);
+	ht -> table[index] = create_data(ht -> table[index], item, shift_bit, level);
 }
 
 void print_hash(Huff_hash *ht)
 {
-	int i = 0;
-	while(i < 257)
+	int i;
+	for(i = 0; i < 257; i++)
 	{
 		if(ht->table[i]->freq != 0)
-		{
-			printf("%c -> %d\n", ht->table[i]->item, ht->table[i]->shift_bit);
-		}
-		i++;
+			printf("%c -> %d, (%d)\n", *(unsigned char*)ht->table[i]->item, ht->table[i]->shift_bit, ht->table[i]->bits);
 	}
 	printf("\n");
 }

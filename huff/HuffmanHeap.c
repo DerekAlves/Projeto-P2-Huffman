@@ -28,9 +28,9 @@
 #define num_prime 257
 
 
-void swap(int *x, int *y)
+void swap(Huff_node **x, Huff_node **y)
 {
-   int temp;
+   Huff_node *temp;
    temp = *x;
    *x = *y;
    *y = temp;
@@ -41,7 +41,7 @@ Huff_heap* create_heap()
 	int i;
 	Huff_heap *new_heap = (Huff_heap*) malloc(sizeof(Huff_heap));
 	new_heap->size = 0;
-	for(i = 1; i < 257; i++)
+	for(i = 1; i < 257; i++) 
 		new_heap->data[i] = NULL;
 	return new_heap;
 }
@@ -52,50 +52,37 @@ int get_left_index(Huff_heap *heap, int i) { return 2*i; }
 
 int get_right_index(Huff_heap *heap, int i) { return 2*i + 1; }
 
-int item_of(Huff_heap *heap, int i) { return heap->data[i]; }
+Huff_node *item_of(Huff_heap *heap, int i) { return heap->data[i]; }
 
-void min_heapify(Huff_heap *heap, int i)
+void min_heapify(Huff_heap *heap, int i) //o no de menor frequencia no topo da heap
 {
-	int largest;
-	int left_index = get_left_index(heap, i);
+	int smallest;
+	int left_index = get_left_index(heap, i);	
 	int right_index = get_right_index(heap, i);
-	if (left_index <= heap->size && heap->data[left_index]->freq < heap->data[i]->freq) largest = left_index;
-	else largest = i;
-	if (right_index <= heap->size && heap->data[right_index]->freq < heap->data[largest]->freq) largest = right_index;
-	if (heap->data[i]->freq != heap->data[largest]->freq)
+	if (left_index <= heap->size && (heap->data[left_index]->freq < heap->data[i]->freq))
+		smallest = left_index;	//recebe indice do menor: left (esta no lugar errado)
+	else smallest = i; //meu menor ainda é o i;
+	if (right_index <= heap->size && (heap->data[right_index]->freq < heap->data[smallest]->freq))
+		smallest = right_index; //recebe o indice do menor: right (esta no lugar erradp)
+	if (heap->data[i]->freq != heap->data[smallest]->freq) // se for menor que o meu topo, ja que sempre i = 1
 	{
-		swap(&heap->data[i], &heap->data[largest]);
-		min_heapify(heap, largest);
+		swap(&(heap->data[i]), &(heap->data[smallest]));
+		min_heapify(heap, smallest);
 	}
 }
 
-void max_heapify(Huff_heap *heap, int i)
-{
-	int largest;
-	int left_index = get_left_index(heap, i);
-	int right_index = get_right_index(heap, i);
-	if (left_index <= heap->size && heap->data[left_index]->freq > heap->data[i]->freq) largest = left_index;
-	else largest = i;
-	if (right_index <= heap->size && heap->data[right_index]->freq > heap->data[largest]->freq) largest = right_index;
-	if (heap->data[i]->freq != heap->data[largest]->freq)
-	{
-		swap(&heap->data[i], &heap->data[largest]);
-		max_heapify(heap, largest);
-	}
-}
-
-void enqueue_heap(Huff_heap *heap, void *item, void *freq, Huff_node *down_left, Huff_node *down_right)
-{
-	if (heap->size >= 257) printf("Heap overflow");
+void enqueue_heap(Huff_heap *heap, void *item, int freq, Huff_node *down_left, Huff_node *down_right)
+{	
+	if (heap->size >= 256) printf("Heap overflow");
 	else
 	{
-		heap->data[++heap->size] = new_huff_node(item, freq, down_left, down_right);
+		heap->data[++heap->size] = new_huff_node(item, freq, down_left, down_right); //incrementa pra add
 		int key_index = heap->size;
-		int parent_index = get_parent_index(heap, heap->size);
-		while (parent_index >= 1 && heap->data[key_index]->freq > heap->data[parent_index]->freq)
+		int parent_index = get_parent_index(heap, heap->size);   //indice pai de key_index
+		while (parent_index >= 1 && heap->data[key_index]->freq < heap->data[parent_index]->freq)
 		{
-			swap(&heap->data[key_index], &heap->data[parent_index]);
-			key_index = parent_index;
+			swap(&heap->data[key_index], &heap->data[parent_index]); //troca nos com freq menores(topo)
+			key_index = parent_index;   //checa ate o topo
 			parent_index = get_parent_index(heap, key_index);
 		}
 	}
@@ -112,23 +99,10 @@ Huff_node *dequeue_heap(Huff_heap *heap)
 	{
 		Huff_node *item = heap->data[1];
 		heap->data[1] = heap->data[heap->size];
-		heap->size--;
-		min_heapify(heap, 1);
+		heap->size--; //remocao logica
+		min_heapify(heap,1);
 		return item;
 	}
-}
-
-void heapsort(Huff_heap *heap)
-{
-	int i, size;
-	size = heap -> size;
-	for (i = heap->size; i >= 2; i--)
-	{
-		swap(&heap->data[1], &heap->data[i]);
-		heap->size--;
-		max_heapify(heap, 1);
-	}
-	heap -> size = size;
 }
 
 void print_heap(Huff_heap *heap, int size)
@@ -136,7 +110,7 @@ void print_heap(Huff_heap *heap, int size)
 	int i;
 	for(i = 1; i <= size; i++)
 	{
-		printf("%c -> %d\n", heap->data[i]->item, heap->data[i]->freq);
+		printf("%c -> %d\n", *(unsigned char*)heap->data[i]->item, heap->data[i]->freq);
 	}
 	puts("");
 }

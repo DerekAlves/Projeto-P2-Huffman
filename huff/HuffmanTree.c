@@ -31,61 +31,67 @@
 Huff_node *new_huff_node(void *item, int freq, Huff_node *down_left, Huff_node *down_right)
 {
 	Huff_node *node_queue = (Huff_node*) malloc(sizeof(Huff_node));
-	node_queue->item = item;
+	node_queue->item = (unsigned char*) malloc(sizeof(unsigned char));
+	*(unsigned char *)node_queue->item = *(unsigned char*)item;
 	node_queue->freq = freq;
 	node_queue->down_left = down_left;
 	node_queue->down_right = down_right;
 	return node_queue;
 }
 
-Huff_node *create_tree()
+int tree_size(Huff_node* raiz)
 {
-	Huff_node *new_tree = (Huff_node*) malloc(sizeof(Huff_node));
-	new_tree = new_huff_node(NULL, NULL, NULL, NULL);
-	return new_tree;
+	if(raiz == NULL) return 0;
+	else return  1 + tree_size(raiz -> down_left) + tree_size(raiz -> down_right);
 }
 
-Huff_node *criar_arvore(struct heap *heap/*, Huff_node *tree*/)
+Huff_node *create_tree(Huff_heap *heap)
 {
-	int size;
-	while(heap->size > 1)
+	//int size;
+	while(heap->size > 0)
 	{
 		Huff_node *esq = dequeue_heap(heap);
 		Huff_node *dir = dequeue_heap(heap);
 
-		enqueue_heap(heap, 42, esq->freq + dir->freq, esq, dir);
-		size = heap->size;
-		heapsort(heap);
-		heap->size = size;
+		unsigned char asterisco = 42;
+		if(heap->size == 0)
+		{	
+			return new_huff_node(&asterisco, (esq->freq + dir->freq), esq, dir);
+		}
+		if((*(unsigned char*)dir->item == '*' && *(unsigned char*)esq->item != '*') && (dir->freq == esq->freq))
+		{
+			enqueue_heap(heap, &asterisco,esq->freq + dir->freq, dir, esq);
+		}
+		else
+		{
+			enqueue_heap(heap, &asterisco,esq->freq + dir->freq, esq, dir);
+		}
 	}
-	return dequeue_heap(heap);
 }
 
-Huff_node* create_tree_from_preorder(FILE* in)
+Huff_node* create_tree_from_preorder(FILE* in, int a[])
 {
 	char c;
 	short int flag = 1;
 	fscanf(in, "%c", &c);
-	printf("CHAR %c\n", c);
-	if(c == 92)
+	if(c == 92)  //barra
 	{
+		a[0]++;
 		fscanf(in, "%c", &c);
-		flag = 0;
+		flag = 0;   // faz pular o proximo if de percorrer a arvore, pois indica que tal * é um filho
 	}
 	Huff_node *tree_node;
-	tree_node = new_huff_node(c, 1, NULL, NULL);
-	if (c == '*' && flag)
+	tree_node = new_huff_node(&c, 1, NULL, NULL);
+	if (c == '*' && flag == 1)                                       //significa que ainda n é uma folha, nenhum caso especial, continua criando a arvore
 	{
-		//tree_node = new_huff_node(c, 1, create_tree_from_preorder(in), create_tree_from_preorder(in));
-		tree_node -> down_left = create_tree_from_preorder(in);
-		tree_node -> down_right = create_tree_from_preorder(in);
+		tree_node -> down_left = create_tree_from_preorder(in, a);
+		tree_node -> down_right = create_tree_from_preorder(in, a);
 	}
 	return tree_node;
 }
 
-void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bit, int level)
+void create_encoding(Huff_node *raiz, Huff_hash *ht, int flag, unsigned int shift_bit, int level) //forma as novas representacoes dos bytes
 {
-	//printf("%c, %d\n", raiz->item, shift_bit);
 	if(raiz->down_left == NULL && raiz->down_right == NULL)
 	{
 		void *item = raiz->item;
@@ -96,13 +102,13 @@ void dfs(Huff_node *raiz, struct huff_hash *ht, int flag, unsigned char shift_bi
 	{
 		if(flag == 1)
 		{
-			dfs(raiz->down_left, ht, 0, shift_bit + 0, level + 1);
-			dfs(raiz->down_right, ht, 0, shift_bit + 1, level + 1);
+			create_encoding(raiz->down_left, ht, 0, shift_bit, level + 1);
+			create_encoding(raiz->down_right, ht, 0, (shift_bit | 1), level + 1);
 		}
 		else
 		{
-			dfs(raiz->down_left, ht, 0, (shift_bit<<1), level + 1);
-			dfs(raiz->down_right, ht, 0, (shift_bit<<1) + 1, level + 1);
+			create_encoding(raiz->down_left, ht, 0, (shift_bit<<1), level + 1);
+			create_encoding(raiz->down_right, ht, 0, ((shift_bit<<1) | 1), level + 1);
 		}
 	}
 }
@@ -113,20 +119,22 @@ void print_pre_order(Huff_node* raiz)///IF PARA IMPRIMIR \ CASO NO SEJA FOLHA E 
 	{
 		if(raiz->freq != 0)
 		{
-			printf("%c", raiz->item);
+			if(((*(unsigned char*)raiz->item == 92) || *(unsigned char*)raiz->item == 42) && (raiz->down_left == NULL && raiz->down_right == NULL)) printf("%c", 92);
+			printf("%c", *(int*)raiz->item);
 			print_pre_order(raiz->down_left);
 			print_pre_order(raiz->down_right);
 		}
 	}
 }
 
-void print_pre_order_file(Huff_node* raiz, FILE* out)///IF PARA IMPRIMIR \ CASO NO SEJA FOLHA E O CARACTER SEJA * ou \  ////
+void print_pre_order_file(Huff_node* raiz, FILE* out)///IF PARA IMPRIMIR \ CASO NO SEJA FOLHA E O CARACTER SEJA (*) ou (\)  ////
 {
 	if(raiz != NULL)
 	{
 		if(raiz->freq != 0)
 		{
-			fprintf(out, "%c", raiz->item);
+			if(((*(unsigned char*)raiz->item == 92) || *(unsigned char*)raiz->item == 42) && (raiz->down_left == NULL && raiz->down_right == NULL)) fputc(92, out);
+			fputc(*(int*)raiz->item, out);
 			print_pre_order_file(raiz->down_left, out);
 			print_pre_order_file(raiz->down_right, out);
 		}
